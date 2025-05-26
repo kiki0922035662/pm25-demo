@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PM2.5 空氣品質查詢</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="container mx-auto px-4 py-6">
+    <h1 class="text-3xl font-bold mb-6 text-center text-green-700">PM2.5 空氣品質即時查詢</h1>
+    <div id="data-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- 資料卡片會出現在這裡 -->
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = "https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=7e29b5cf-6167-4ddd-a66e-4f8b9eb0f1ad&format=json";
+
+    async function fetchData() {
+      try {
+        const response = await fetch(apiUrl);
+        const json = await response.json();
+        const data = json.records;
+
+        const container = document.getElementById('data-container');
+        container.innerHTML = '';
+
+        data.forEach((item) => {
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-2xl shadow-md p-4 hover:shadow-lg transition';
+
+          // 將 PM2.5 數值分類成顏色（良好、普通、不良）
+          let pmColor = 'text-gray-800';
+          const pm25 = parseInt(item.pm2_5);
+          if (!isNaN(pm25)) {
+            if (pm25 <= 15) pmColor = 'text-green-600';
+            else if (pm25 <= 35) pmColor = 'text-yellow-600';
+            else pmColor = 'text-red-600';
+          }
+
+          card.innerHTML = `
+            <h2 class="text-xl font-bold text-blue-800 mb-2">${item.site}</h2>
+            <p class="text-sm">時間：${item.publish_time}</p>
+            <p class="text-sm">狀態：${item.status}</p>
+            <p class="text-lg font-semibold ${pmColor}">PM2.5：${item.pm2_5 || 'N/A'}</p>
+          `;
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error("❌ 資料取得失敗", error);
+        document.getElementById("data-container").innerHTML = `
+          <p class="text-red-600 text-center">無法取得資料，請稍後再試。</p>
+        `;
+      }
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>
