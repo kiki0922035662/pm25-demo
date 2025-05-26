@@ -46,12 +46,12 @@
         container.innerHTML = "";
         data.forEach(item => {
           const pm25 = parseFloat(item.pm25);
-          let status = "良好", color = "#4caf50";
-          if (pm25 > 35) {
+          let status = "良好", color = "#4caf50", textColor = "white";
+          if (pm25 > 5) {
             status = "普通"; color = "#ff9800";
           }
-          if (pm25 > 53) {
-            status = "對敏感族群不健康"; color = "#f44336";
+          if (pm25 > 10) {
+            status = "不健康"; color = "#f44336";
           }
 
           const col = document.createElement("div");
@@ -60,7 +60,11 @@
             <div class="card shadow h-100">
               <div class="card-body text-center">
                 <h5 class="card-title">${item.site}</h5>
-                <p class="card-text display-6">PM2.5：${item.pm25}</p>
+                <p class="card-text display-6">
+                  <span style="background-color:${color};color:${textColor};padding:6px 12px;border-radius:8px;">
+                    PM2.5：${item.pm25}
+                  </span>
+                </p>
                 <div class="status" style="background-color:${color}">${status}</div>
               </div>
             </div>
