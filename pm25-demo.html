@@ -47,12 +47,11 @@
         data.forEach(item => {
           const pm25 = parseFloat(item.pm25);
           let status = "良好", color = "#4caf50", textColor = "white";
-          if (pm25 > 5) {
-            status = "普通"; color = "#ff9800";
-          }
-          if (pm25 > 10) {
-            status = "不健康"; color = "#f44336";
-          }
+if (pm25 > 10) {
+  status = "不健康"; color = "#f44336";
+} else if (pm25 > 5) {
+  status = "普通"; color = "#ff9800";
+}
 
           const col = document.createElement("div");
           col.className = "col-12 col-sm-6 col-md-4 col-lg-3 mb-4";
