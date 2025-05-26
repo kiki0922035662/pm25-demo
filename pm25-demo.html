@@ -34,6 +34,11 @@
   <div class="container">
     <h1 class="text-center mb-2">🌿 即時 PM2.5 空氣品質查詢</h1>
     <p id="update-time" class="text-center text-secondary mt-2" style="font-size: 0.9rem;">更新時間載入中...</p>
+    <div class="row justify-content-center mb-3">
+      <div class="col-md-6">
+        <input id="search-box" type="text" class="form-control" placeholder="輸入地區關鍵字 (例如：台中、新竹)">
+      </div>
+    </div>
     <div id="data-container" class="row justify-content-center">載入中...</div>
   </div>
 
@@ -44,7 +49,8 @@
         const json = await response.json();
         const data = json.records;
         const container = document.getElementById("data-container");
-        container.innerHTML = "";
+        allData = data;
+        renderData(data);
 
         const now = new Date();
         const timeString = now.toLocaleString("zh-TW", { hour12: false });
@@ -80,6 +86,52 @@
         document.getElementById("data-container").innerText = "資料取得失敗，請稍後再試";
       }
     }
+
+    
+    let allData = [];
+
+    function renderData(filteredData) {
+      const container = document.getElementById("data-container");
+      container.innerHTML = "";
+      if (filteredData.length === 0) {
+        container.innerHTML = "<p class='text-center text-muted'>查無符合資料</p>";
+        return;
+      }
+
+      filteredData.forEach(item => {
+        const pm25 = parseFloat(item.pm25);
+        let status = "良好", color = "#4caf50", textColor = "white";
+        if (pm25 > 10) {
+          status = "不健康"; color = "#f44336";
+        } else if (pm25 > 5) {
+          status = "普通"; color = "#ff9800";
+        }
+
+        const col = document.createElement("div");
+        col.className = "col-12 col-sm-6 col-md-4 col-lg-3 mb-4";
+        col.innerHTML = `
+          <div class="card shadow h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title">${item.site}</h5>
+              <p class="card-text display-6">
+                <span style="background-color:${color};color:${textColor};padding:6px 12px;border-radius:8px;">
+                  PM2.5：${item.pm25}
+                </span>
+              </p>
+              <div class="status" style="background-color:${color}">${status}</div>
+            </div>
+          </div>
+        `;
+        container.appendChild(col);
+      });
+    }
+
+    document.getElementById("search-box").addEventListener("input", e => {
+      const keyword = e.target.value.trim();
+      if (!keyword) return renderData(allData);
+      const filtered = allData.filter(item => item.site.includes(keyword));
+      renderData(filtered);
+    });
 
     fetchPM25();
   </script>
