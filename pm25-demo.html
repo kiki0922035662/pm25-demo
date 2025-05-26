@@ -32,7 +32,8 @@
 </head>
 <body>
   <div class="container">
-    <h1 class="text-center mb-4">🌿 即時 PM2.5 空氣品質查詢</h1>
+    <h1 class="text-center mb-2">🌿 即時 PM2.5 空氣品質查詢</h1>
+    <p id="update-time" class="text-center text-secondary mt-2" style="font-size: 0.9rem;">更新時間載入中...</p>
     <div id="data-container" class="row justify-content-center">載入中...</div>
   </div>
 
@@ -44,14 +45,19 @@
         const data = json.records;
         const container = document.getElementById("data-container");
         container.innerHTML = "";
+
+        const now = new Date();
+        const timeString = now.toLocaleString("zh-TW", { hour12: false });
+        document.getElementById("update-time").innerText = `最後更新時間：${timeString}`;
+
         data.forEach(item => {
           const pm25 = parseFloat(item.pm25);
           let status = "良好", color = "#4caf50", textColor = "white";
-if (pm25 > 10) {
-  status = "不健康"; color = "#f44336";
-} else if (pm25 > 5) {
-  status = "普通"; color = "#ff9800";
-}
+          if (pm25 > 10) {
+            status = "不健康"; color = "#f44336";
+          } else if (pm25 > 5) {
+            status = "普通"; color = "#ff9800";
+          }
 
           const col = document.createElement("div");
           col.className = "col-12 col-sm-6 col-md-4 col-lg-3 mb-4";
